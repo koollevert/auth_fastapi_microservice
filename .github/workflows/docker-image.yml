@@ -27,7 +27,7 @@ jobs:
           mkdir ${HOME}/.kube
           echo ${{ secrets.KUBE_CONFIG }} | base64 -d > ${HOME}/.kube/config
           cat ${HOME}/.kube/config
-          kubectl config get-contexts
+          
       - name: Use contecxt
         run: kubectl config use-context octobay-api
       - name: Deploy to delete and rollout deployment
