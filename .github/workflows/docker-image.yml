@@ -23,3 +23,16 @@ jobs:
          docker login -u joshuamumo -p ${{ secrets.DOCKER_HUB_TOKEN }} 
          docker push joshuamumo/client:latest
       
+      - name: Use delete deployment
+        uses: actions-hub/kubectl@master
+        env:
+           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+           args: rollout status deployment/client-depl
+      
+      - name: rollout deployment
+        uses: actions-hub/kubectl@master
+        env:
+           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+           args: delete pods -l app=client
