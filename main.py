@@ -3,6 +3,10 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 app = FastAPI()
 
-@app.get("/api/auth-fastapi/") 
-async def test():
+router = APIRouter()
+
+@router.get("/auth-fastapi/")
+async def read_root():
     return {"message": "Hello World"}
+
+app.include_router(router, prefix="/api")
