@@ -9,4 +9,5 @@ router = APIRouter()
 async def read_root():
     return {"message": "Hello World"}
 
-app.include_router(router, prefix="/api")
+app.include_router(router, prefix="/api") 
+# minimalist router
