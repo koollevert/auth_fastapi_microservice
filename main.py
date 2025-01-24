@@ -24,7 +24,9 @@ async def lifespan(app: FastAPI):
         raise e
     yield
     # Shutdown event
-    await client.close()
+    
+    client.close()
+    print("Disconnected from the MongoDB database!")
 
 app = FastAPI(lifespan=lifespan)
 
