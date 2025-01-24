@@ -38,7 +38,7 @@ def create_jwt(user_id: str, email: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
 # Routes
-@router.post("/auth/signup", response_model=UserResponse)
+@router.post("/auth-fastapi/signup", response_model=UserResponse)
 async def signup(signup_data: SignupRequest = Body(...)):
     # Check if user already exists
     existing_user = await users_collection.find_one({"email": signup_data.email})
