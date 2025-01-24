@@ -1,6 +1,7 @@
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import FastAPI
 from fastapi.routing import APIRouter
+from routes.signup import router as signup_router
+
 app = FastAPI()
 
 router = APIRouter()
@@ -9,5 +10,5 @@ router = APIRouter()
 async def read_root():
     return {"message": "Hello World"}
 
-app.include_router(router, prefix="/api") 
-# minimalist router
+app.include_router(router, prefix="/api")
+app.include_router(signup_router, prefix="/api")

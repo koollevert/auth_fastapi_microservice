@@ -22,6 +22,13 @@ jobs:
         run: |
          docker login -u joshuamumo -p ${{ secrets.DOCKER_HUB_TOKEN }} 
          docker push joshuamumo/auth-fastapi:latest
+
+      - name: rollout deployment
+        uses: actions-hub/kubectl@master
+        env:
+           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+              args: delete pods -l app=auth-fastapi
       
       - name: Use delete deployment
         uses: actions-hub/kubectl@master
@@ -30,9 +37,3 @@ jobs:
         with:
            args: rollout status deployment/auth-fastapi-depl
       
-      - name: rollout deployment
-        uses: actions-hub/kubectl@master
-        env:
-           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        with:
-           args: delete pods -l app=auth-fastapi
