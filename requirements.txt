@@ -6,5 +6,7 @@ passlib[bcrypt]
 motor
 PyJWT
 pydantic[email]
+cryptography
+bson
 
 

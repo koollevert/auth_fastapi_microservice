@@ -3,20 +3,14 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 import jwt
-from motor.motor_asyncio import AsyncIOMotorClient
-from passlib.context import CryptContext
 import os
+
+from mongoOps.operations import create_user, get_user_by_email
+from mongoOps.user_model import User, UserResponse
+from main import get_database  # Import the get_database dependency
 
 # Create a router
 router = APIRouter()
-
-# Database setup (MongoDB example)
-client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
-db = client.my_database
-users_collection = db.users
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Secret key
 JWT_SECRET = os.getenv("JWT_KEY", "mysecretkey")
@@ -27,11 +21,6 @@ class SignupRequest(BaseModel):
     password: str = Field(..., min_length=4, max_length=20)
     name: str = Field(..., min_length=1)
 
-class UserResponse(BaseModel):
-    id: str
-    email: str
-    name: str
-
 # Utility functions
 def create_jwt(user_id: str, email: str) -> str:
     payload = {"id": user_id, "email": email}
@@ -39,27 +28,24 @@ def create_jwt(user_id: str, email: str) -> str:
 
 # Routes
 @router.post("/auth-fastapi/signup", response_model=UserResponse)
-async def signup(signup_data: SignupRequest = Body(...)):
+async def signup(signup_data: SignupRequest = Body(...), db=Depends(get_database)):
     # Check if user already exists
-    existing_user = await users_collection.find_one({"email": signup_data.email})
+    existing_user = await get_user_by_email(signup_data.email, db)
     if existing_user:
         raise HTTPException(status_code=400, detail="Email in use")
 
-    # Hash password
-    hashed_password = pwd_context.hash(signup_data.password)
-
     # Create new user
-    new_user = {
-        "email": signup_data.email,
-        "password": hashed_password,
-        "name": signup_data.name,
-    }
-    result = await users_collection.insert_one(new_user)
+    new_user = User(
+        email=signup_data.email,
+        password=signup_data.password,
+        name=signup_data.name
+    )
+    created_user = await create_user(new_user, db)
 
     # Generate JWT token
-    user_jwt = create_jwt(str(result.inserted_id), signup_data.email)
+    user_jwt = create_jwt(str(created_user.id), created_user.email)
 
     # Mock session (store JWT as an example)
-    response = UserResponse(id=str(result.inserted_id), email=signup_data.email, name=signup_data.name)
+    response = UserResponse(id=str(created_user.id), email=created_user.email, name=created_user.name)
     headers = {"Authorization": f"Bearer {user_jwt}"}
     return JSONResponse(content=response.dict(), headers=headers)
