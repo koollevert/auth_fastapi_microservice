@@ -4,5 +4,5 @@ python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
 motor
-jwt
-os
+PyJWT
+
