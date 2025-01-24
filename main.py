@@ -24,7 +24,6 @@ async def lifespan(app: FastAPI):
         raise e
     yield
     # Shutdown event
-    
     client.close()
     print("Disconnected from the MongoDB database!")
 
@@ -40,6 +39,6 @@ app.include_router(router, prefix="/api")
 app.include_router(signup_router, prefix="/api")
 
 # Start the application
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)
